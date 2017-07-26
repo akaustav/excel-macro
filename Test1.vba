@@ -1,62 +1,49 @@
 Sub Test1()
-'
-' Test1 Macro
-' This macro finds the column with the heading Ameet and displays a message box containing the cell number
-'
 
-' Loop thru all column headings and find the cell with the column heading matching "Ameet"
-' Convert the column type to currency
+    ' Test1 Macro
+    ' This macro finds the columns with the known headings and changes their formats if found
+
 
     ' 01. Find the active worksheet
     Dim ws As Worksheet
     Set ws = ActiveWorkbook.ActiveSheet
 
-    
-    ' 02. Find the cells on the header row
-    Dim headerRowNumber As Integer
-    Dim startCol As String
-    Dim endCol As String
-    Dim startCellName As String
-    Dim endCellName As String
-    Dim cellRange As Range
-    Dim cellValue As String
 
-    headerRowNumber = 1 ' Configurable - just in case the header is not on row 1
-    startCol = "A" ' Configurable - just in case the first column is not A
-    endCol = "Z" ' Configurable - just in case the last column is not Z
-    startCellName = startCol & headerRowNumber
-    endCellName = endCol & headerRowNumber
+    ' 02. Find the cells on the header row
+    Dim headerRowNumber As Integer: headerRowNumber = 1 ' Configurable - just in case the header is not on row 1
+    Dim startCol As String: startCol = "A" ' Configurable - just in case the first column is not A
+    Dim endCol As String: endCol = "Z" ' Configurable - just in case the last column is not Z
+    Dim startCellName As String: startCellName = startCol & headerRowNumber
+    Dim endCellName As String: endCellName = endCol & headerRowNumber
+
+    Dim cellRange As Range
     Set cellRange = ws.Cells.Range(startCellName, endCellName)
 
 
-    ' 03. Change the data type of the columns
-    Dim message As String
-    message = "Values in cells from " & startCellName & " thru " & endCellName & " are:"
+    ' 03. List all known column names in an array
+    Dim knownCols(5) As String
 
+    knownCols(0) = "Header1"
+    knownCols(1) = "Header3"
+    knownCols(2) = "Header5"
+    knownCols(3) = "Header7"
+    knownCols(4) = "Header9"
+
+
+    ' 04. Change the data type of all known columns
     Dim cell As Range
     Dim colNum As Integer
 
-    For Each cell In cellRange
-        If Trim(cell.Value) <> "" Then
+    For Each knownCol In knownCols
+        Set cell = cellRange.Find(What:=knownCol, LookAt:=xlWhole, MatchCase:=False)
+        If cell Is Nothing Then
+            MsgBox "Could not find column with header = " & knownCol
+        Else
             colNum = cell.Column
             ws.Columns(colNum).NumberFormat = "#,##0.00"
-            message = message & vbNewLine & "Col" & cell.Column & " = " & cell.Value
         End If
-    Next cell
+    Next knownCol
 
-    MsgBox message
-
-'    Dim rng As Range
-'    Dim colHeading As String
-
-'    colHeading = "Ameet"
-
-'    With Worksheets(activeWorksheet).Range("A1:BB1")
-'        Set rng = Worksheets(activeWorksheet).Range("A1:BB1").Find(What:=colHeading, LookAt:=xlWhole, MatchCase:=False)
-'        Do While Not rng Is Nothing
-'            MsgBox "The column with " & colHeading & " is at " & rng
-'            Set rng = .FindNext
-'        Loop
-'    End With
+    MsgBox "All known columns have been formatted"
 
 End Sub
